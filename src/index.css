@@ -15,6 +15,7 @@ body {
 }
 
 @layer components {
+    /* AUTH */
     .auth-form {
         @apply h-full flex flex-col justify-start items-start gap-2 lg:gap-3
     }
@@ -26,5 +27,17 @@ body {
     }
     .submit-btn {
         @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
+    }
+
+    /* MODAL */
+    .modal-overlay {
+        @apply fixed inset-0 backdrop-blur-[13px] backdrop-saturate-[180%] bg-[rgba(17,25,40,0.75)] ;
+        -webkit-backdrop-filter: blur(13px) saturate(180%);
+    }
+    .modal-content {
+        @apply fixed drop-shadow-md border border-blue-700 top-[50%] left-[50%] max-h-full h-full md:h-auto md:max-h-[85vh] w-full md:w-[90vw] md:max-w-[700px] translate-x-[-50%] translate-y-[-50%] rounded-md bg-blue-500 p-4 focus:outline-none
+    }
+    .modal-close-btn {
+        @apply text-neutral-200 hover:text-white absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:outline-none
     }
 }
