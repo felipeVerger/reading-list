@@ -8,6 +8,7 @@ export default {
     extend: {
       backgroundColor: {
         blackOverlay: 'rgba(0, 0 ,0 ,0.7)',
+        modalBackground: 'rgba(22, 41, 183, 0.39)'
       },
       fontFamily: {
         mooli: 'Mooli, sans-serif'
@@ -17,6 +18,9 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    // eslint-disable-next-line no-undef
+    require('tailwindcss-animated')
+  ],
 }
 
