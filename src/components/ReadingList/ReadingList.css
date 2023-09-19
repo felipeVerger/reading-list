@@ -1,0 +1,12 @@
+.reading-list_container {
+    max-width: 400px;
+    flex: 1;
+}
+
+
+@media screen and (max-width: 1024px){
+    .reading-list_container {
+        max-width: none;
+        width: 100%;
+    }
+}

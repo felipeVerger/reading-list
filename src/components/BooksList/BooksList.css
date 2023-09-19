@@ -1,0 +1,42 @@
+.book-list_container {
+    flex: 1;
+    min-width: 600px;
+}
+
+header {
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    font-size: 1.5em;
+    color: whitesmoke;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+header h2 span {
+    font-size: 1.6em;
+    color: #0288ce;
+}
+
+.books_container {
+    width: 100%;
+    padding: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+@media screen and (max-width: 1024px){
+    .books_container {
+        padding: 2rem;
+        overflow-y: auto;
+    }
+}
