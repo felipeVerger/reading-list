@@ -59,6 +59,7 @@ export const userLogin = createAsyncThunk(
                 .then((res) => {
                     const isPasswordValid = verifyPassword(password, res[0]?.password);
                     if(res[0]?.email === email && isPasswordValid) {
+                        localStorage.setItem('user', JSON.stringify(res));
                         return res
                     } else {
                         throw new Error("The email or the password are invalid")
