@@ -1,26 +1,28 @@
+import { useState } from "react";
+import { fetchUser } from "../../utils/fetchUser";
+import { Modal, BooksProfile, EditProfile, MainProfile } from "..";
 import useProfileModal from "../../hooks/useProfileModal"
-import Modal from "./Modal"
 
 
 const ProfileModal = () => {
+  const [activeComponent, setActiveComponent] = useState<'main' | 'edit' | 'books'>('main');
   const { onClose, isOpen } = useProfileModal();
+  const user = fetchUser();
 
   const onChange = (open: boolean) => {
     if (!open) {
-        onClose()
+        onClose();
+        setActiveComponent('main');
     }
   }
 
   return (
-    <Modal
-        title="Profile"
-        description="Your personalized space to manage your account, update information, and tailor your experience. Edit your details, preferences, and more in one central hub."
-        isOpen={isOpen}
-        onChange={onChange}
-    >
-        Profile modal children
+    <Modal isOpen={isOpen} onChange={onChange}>
+      {activeComponent === 'main' && <MainProfile user={user} setActiveComponent={setActiveComponent}/>}
+      {activeComponent === 'edit' && <EditProfile user={user} setActiveComponent={setActiveComponent}/>}
+      {activeComponent === 'books' && <BooksProfile/>}
     </Modal>
-  )
+  );
 }
 
 export default ProfileModal
