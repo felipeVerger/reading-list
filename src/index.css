@@ -35,9 +35,18 @@ body {
         -webkit-backdrop-filter: blur(13px) saturate(180%);
     }
     .modal-content {
-        @apply fixed drop-shadow-md border border-blue-700 top-[50%] left-[50%] max-h-full h-full md:h-auto md:max-h-[85vh] w-full md:w-[90vw] md:max-w-[700px] translate-x-[-50%] translate-y-[-50%] rounded-md bg-blue-500 p-4 focus:outline-none
+        @apply fixed drop-shadow-md  top-[50%] left-[50%] max-h-full h-full md:h-auto md:max-h-[85vh] w-full md:w-[90vw] md:max-w-[700px] translate-x-[-50%] translate-y-[-50%]  p-8 focus:outline-none backdrop-blur-lg backdrop-saturate-[180%] bg-[rgba(17,25,40,0.75)] border rounded-none md:rounded-xl border-solid border-[rgba(255,255,255,0.125)];
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
     }
     .modal-close-btn {
         @apply text-neutral-200 hover:text-white absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:outline-none
+    }
+
+    /* PROFILE MODAL */
+    .profile-modal_btn {
+        @apply w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+    }
+    .profile-modal_outline-btn {
+        @apply bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded flex justify-center items-center gap-2
     }
 }

@@ -55,6 +55,12 @@ const AuthForm = () => {
     }
   }
 
+  const switchForm = () => {
+    setImage('');
+    methods.reset();
+    setIsLoggedIn(!isLoggedIn);
+  }
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="auth-form">
@@ -108,7 +114,7 @@ const AuthForm = () => {
           <button
             type="button"
             className="ml-2 text-base font-medium text-blue-500"
-            onClick={() => setIsLoggedIn(!isLoggedIn)}
+            onClick={switchForm}
           >
             {!isLoggedIn ? "Sign In" : "Sign Up"}
           </button>

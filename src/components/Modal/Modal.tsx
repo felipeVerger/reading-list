@@ -6,12 +6,10 @@ import { IoMdClose } from 'react-icons/io';
 interface ModalProps {
     isOpen: boolean;
     onChange: (open: boolean) => void;
-    title: string;
-    description: string;
     children: React.ReactNode;
 }
 
-const Modal:FC<ModalProps> = ({ isOpen, onChange, title, description, children}) => {
+const Modal:FC<ModalProps> = ({ isOpen, onChange, children}) => {
   return (
     <Dialog.Root
         open={isOpen}
@@ -25,8 +23,8 @@ const Modal:FC<ModalProps> = ({ isOpen, onChange, title, description, children})
             <Dialog.Content
                 className='modal-content animate-fade'
             >
-                <Dialog.Title className='text-center text-white text-2xl md:text-left font-bold mb-2'>{title}</Dialog.Title>
-                <Dialog.Description className='text-center md:text-left text-slate-300 text-sm'>{description}</Dialog.Description>
+                {/* <Dialog.Title className='text-center text-white text-2xl md:text-left font-bold mb-2'>{title}</Dialog.Title>
+                <Dialog.Description className='text-center md:text-left text-slate-300 text-sm'>{description}</Dialog.Description> */}
                 <div>
                     {children}
                 </div>

@@ -1,5 +1,6 @@
-import { createClient,type ClientConfig } from "@sanity/client";
+import { createClient,type ClientConfig, SanityImageAssetDocument } from "@sanity/client";
 import imageUrlBuilder from '@sanity/image-url';
+import { Avatar } from "./types/user.type";
 
 const config: ClientConfig = {
     projectId: import.meta.env.VITE_APP_SANITY_PROJECT_ID,
@@ -13,4 +14,4 @@ export const client = createClient(config);
 
 const builder = imageUrlBuilder(client);
 
-export const urlFor = (source:string) => builder.image(source);
+export const urlFor = (source:SanityImageAssetDocument | string | Avatar) => builder.image(source);
