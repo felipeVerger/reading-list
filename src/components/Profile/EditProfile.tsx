@@ -1,7 +1,8 @@
 import { ChangeEvent, Dispatch, FC, FormEvent, SetStateAction, useState } from 'react'
 import { Avatar, User } from '../../types/user.type'
 
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiSolidImageAdd } from 'react-icons/bi';
+import { FcRemoveImage } from 'react-icons/fc';
 import { client, urlFor } from '../../client';
 import { SanityImageAssetDocument } from '@sanity/client';
 import { Loader } from '..';
@@ -11,20 +12,40 @@ interface Props {
   setActiveComponent: Dispatch<SetStateAction<'main' | 'edit' | 'books'>>;
 }
 
+interface LoadingState {
+  isAvatarLoading: boolean;
+  isHomeBgLoading: boolean;
+}
+
+interface WrongImageTypeState {
+  isAvatarError: boolean;
+  isHomeBgError: boolean;
+}
+
 const EditProfile:FC<Props> = ({ user, setActiveComponent }) => {
   const [avatar, setAvatar] = useState<null | Avatar | SanityImageAssetDocument>(null);
+  const [homeBg, setHomeBg] = useState<null | Avatar | SanityImageAssetDocument>(null);
   const [username, setUsername] = useState('');
-  const [wrongImageType, setWrongImageType] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [wrongImageType, setWrongImageType] = useState<WrongImageTypeState>({
+    isAvatarError: false,
+    isHomeBgError: false
+  });
+  const [loading, setLoading] = useState<LoadingState>({
+    isAvatarLoading: false,
+    isHomeBgLoading: false
+  });
 
-  const uploadImage = (e: ChangeEvent<HTMLInputElement>) => {
+  const uploadAvatarImage = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files ? e.target.files[0] : null;
     
     if (selectedFile) {
-      setLoading(true)
+      setLoading({
+        ...loading, 
+        isAvatarLoading: true
+      })
       const { type, name } = selectedFile;
       if(type === 'image/png' || type === 'image/svg' || type === 'image/jpeg' || type === 'image/gif' || type === 'image/tiff'){
-        setWrongImageType(false);
+        setWrongImageType({...wrongImageType, isAvatarError: false});
   
         client.assets
           .upload('image', selectedFile, { contentType: type, filename: name })
@@ -33,28 +54,58 @@ const EditProfile:FC<Props> = ({ user, setActiveComponent }) => {
           })
           .catch((error) => {
             console.log('Image upload error: ' + error);
-          }).finally(() => setLoading(false))
+          }).finally(() => setLoading({...loading, isAvatarLoading: false }))
       } else {
-        setWrongImageType(true);
-        setLoading(false);
+        setWrongImageType({...wrongImageType, isAvatarError: true});
+        setLoading({...loading, isAvatarLoading: false })
+      }
+    }
+  }
+
+  const uploadHomeBgImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files ? e.target.files[0] : null;
+    
+    if (selectedFile) {
+      setLoading({ ...loading, isHomeBgLoading: true })
+      const { type, name } = selectedFile;
+      if(type === 'image/png' || type === 'image/svg' || type === 'image/jpeg' || type === 'image/gif' || type === 'image/tiff'){
+        setWrongImageType({ ...wrongImageType, isHomeBgError: false});
+  
+        client.assets
+          .upload('image', selectedFile, { contentType: type, filename: name })
+          .then((docuemnt) => {
+            setHomeBg(docuemnt as SanityImageAssetDocument);
+          })
+          .catch((error) => {
+            console.log('Image upload error: ' + error);
+          }).finally(() => setLoading({ ...loading, isHomeBgLoading: false }))
+      } else {
+        setWrongImageType({ ...wrongImageType, isHomeBgError: true});
+        setLoading({ ...loading, isHomeBgLoading: false });
       }
     }
   }
 
   const handleSubmit = (e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(avatar);
     
     client.patch(user._id as string)
       .set({
-        username,
-        image: {
+        username: username === '' ? user.username : username,
+        image: avatar ? {
           _type: 'image',
           asset: {
             _type: "reference",
             _ref: avatar?._id
           }
-        }
+        } : user.image,
+        homeBackground: homeBg ? {
+          _type: 'image',
+          asset: {
+            _type: "reference",
+            _ref: homeBg?._id
+          }
+        } : user.homeBackground
       }).commit()
         .then((res) => {
           localStorage.removeItem('user');
@@ -66,16 +117,19 @@ const EditProfile:FC<Props> = ({ user, setActiveComponent }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col justify-start items-start gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full flex flex-col justify-start items-start gap-4"
+    >
       <label htmlFor="file" className="self-center cursor-pointer">
         <div className="relative w-32 h-32 rounded-full border-none overflow-hidden">
-          {loading ? (
+          {loading.isAvatarLoading ? (
             <div className="w-full h-full rounded-full flex justify-center items-center bg-transparent border border-solid border-[rgba(255,255,255,0.125)]">
               <Loader />
             </div>
-          ) : wrongImageType ? (
+          ) : wrongImageType.isAvatarError ? (
             <div className="w-full h-full bg-slate-400 flex justify-center items-center">
-              <p className="text-lg font-medium text-red-400">
+              <p className="text-sm font-medium text-red-400">
                 Wrong image type
               </p>
             </div>
@@ -95,7 +149,7 @@ const EditProfile:FC<Props> = ({ user, setActiveComponent }) => {
           id="file"
           name="avatar"
           className="hidden"
-          onChange={uploadImage}
+          onChange={uploadAvatarImage}
         />
       </label>
       <label htmlFor="username" className="w-full flex flex-col gap-2">
@@ -111,11 +165,45 @@ const EditProfile:FC<Props> = ({ user, setActiveComponent }) => {
           className="w-full h-12 bg-transparent rounded-md indent-2 text-slate-300 border border-solid border-[rgba(255,255,255,0.125)] outline-none"
         />
       </label>
-      <div className='w-full flex flex-col md:flex-row justify-center items-center gap-4'>
-        <button type="button" onClick={() => setActiveComponent('main')} className="profile-modal_outline-btn w-full hover:bg-red-500 text-red-700 border-red-500">
+      <label htmlFor="homeBg" className="w-full cursor-pointer flex flex-col gap-2">
+        <p className='text-slate-300'>Home background:</p>
+        <div className="w-full h-36 bg-transparent rounded-md border border-solid border-[rgba(255,255,255,0.125)] flex justify-center items-center text-4xl text-slate-300">
+          <>
+            {loading.isHomeBgLoading ? (
+              <Loader />
+            ) : wrongImageType.isHomeBgError ? (
+              <div className='w-full flex flex-col justify-center items-center gap-2'>
+                <FcRemoveImage/>
+                <p className='text-sm text-red-400'>Wrong image type, the only supported types are: png, svg, jpeg, gif and tiff</p>
+              </div>
+            ) : homeBg ? (
+              <img src={urlFor(homeBg)} alt="home-background preview" className='w-full h-full object-cover'/>
+            ) : (
+              <BiSolidImageAdd />
+            )}
+          </>
+        </div>
+        <input
+          type="file"
+          id="homeBg"
+          name="homeBg"
+          className="hidden"
+          onChange={uploadHomeBgImage}
+        />
+      </label>
+      <div className="w-full flex flex-col md:flex-row justify-center items-center gap-4">
+        <button
+          type="button"
+          onClick={() => setActiveComponent("main")}
+          className="profile-modal_outline-btn w-full hover:bg-red-500 text-red-700 border-red-500"
+        >
           Back
         </button>
-        <button disabled={avatar || username ? false : true} type='submit' className="profile-modal_outline-btn w-full hover:bg-green-500 text-green-700 border-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+        <button
+          disabled={avatar || username || homeBg ? false : true}
+          type="submit"
+          className="profile-modal_outline-btn w-full hover:bg-green-500 text-green-700 border-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+        >
           Save
         </button>
       </div>

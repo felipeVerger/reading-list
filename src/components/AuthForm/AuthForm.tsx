@@ -2,24 +2,51 @@ import { useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema, registerSchema } from '../../constants/auth.schema';
-import FileBase from 'react-file-base64';
 import Input from '../shared/Input';
 import { generateSalt, hashPassword } from '../../utils/function';
 import { useAppDispatch, useAppSelector } from '../../hooks/storeHooks';
 import { registerUser, userLogin } from '../../redux/actions/authActions';
 import { useNavigate } from 'react-router-dom';
+import { SanityImageAssetDocument } from '@sanity/client';
+import { Avatar } from '../../types/user.type';
+import { client } from '../../client';
 
 const AuthForm = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector(state => state.auth)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [image, setImage] = useState<string>('');
+  const [image, setImage] = useState<null | Avatar | SanityImageAssetDocument>(null);
+  const [wrongImageType, setWrongImageType] = useState<boolean>(false);
   const methods = useForm({
     resolver: yupResolver(isLoggedIn ? loginSchema : registerSchema)
   })
   const navigate = useNavigate();
 
+  const uploadAvatarImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files ? e.target.files[0] : null;
+    
+    if (selectedFile) {
+      const { type, name } = selectedFile;
+      if(type === 'image/png' || type === 'image/svg' || type === 'image/jpeg' || type === 'image/gif' || type === 'image/tiff'){
+        setWrongImageType(false);
+  
+        client.assets
+          .upload('image', selectedFile, { contentType: type, filename: name })
+          .then((docuemnt) => {
+            setImage(docuemnt as SanityImageAssetDocument);
+          })
+          .catch((error) => {
+            console.log('Image upload error: ' + error);
+          })
+      } else {
+        setWrongImageType(true);
+      }
+    }
+  }
+
   const onSubmit = () => {
+    console.log(wrongImageType);
+    
     const { username, email, password } = methods.getValues();
     const salt = generateSalt();
     const hashedPassword = hashPassword(password, salt);
@@ -41,7 +68,13 @@ const AuthForm = () => {
         username,
         email,
         password: hashedPassword,
-        image,
+        image: {
+          _type: 'image',
+          asset: {
+            _type: "reference",
+            _ref: image?._id
+          }
+        },
         salt
       };
       dispatch(registerUser(doc)).then((res) => {
@@ -56,7 +89,7 @@ const AuthForm = () => {
   }
 
   const switchForm = () => {
-    setImage('');
+    setImage(null);
     methods.reset();
     setIsLoggedIn(!isLoggedIn);
   }
@@ -97,13 +130,16 @@ const AuthForm = () => {
               error={methods.formState.errors.confirmPassword?.message}
               isError={Boolean(methods.formState.errors.confirmPassword)}
             />
-            <FileBase
-              type="file"
-              multiple={false}
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              onDone={({ base64 }) => setImage(base64)}
-            />
+            <label htmlFor="avatar">
+              Avatar
+              <input
+                type="file"
+                id="avatar"
+                name="avatar"
+                className="hidden"
+                onChange={uploadAvatarImage}
+              />
+            </label>
           </>
         )}
         <button className="submit-btn" type="submit">
