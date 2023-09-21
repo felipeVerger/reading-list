@@ -9,7 +9,13 @@ interface UserData {
     username: Maybe<string | undefined>
     email: string;
     password: string;
-    image: string;
+    image: {
+        _type: string,
+        asset: {
+          _type: string,
+          _ref: string | undefined
+        }
+      };
     salt: string
 }
 
@@ -57,6 +63,8 @@ export const userLogin = createAsyncThunk(
 
             const data = await client.fetch(query)
                 .then((res) => {
+                    console.log(res);
+                    
                     const isPasswordValid = verifyPassword(password, res[0]?.password);
                     if(res[0]?.email === email && isPasswordValid) {
                         localStorage.setItem('user', JSON.stringify(res));

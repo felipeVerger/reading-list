@@ -6,6 +6,7 @@ export interface User {
     _updatedAt?: string;
     email: string
     image: string;
+    homeBackground: string;
     password:string;
     username:string;
     userToken?: string
