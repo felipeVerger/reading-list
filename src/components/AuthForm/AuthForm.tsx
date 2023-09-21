@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema, registerSchema } from '../../constants/auth.schema';
-import Input from '../shared/Input';
 import { generateSalt, hashPassword } from '../../utils/function';
 import { useAppDispatch, useAppSelector } from '../../hooks/storeHooks';
 import { registerUser, userLogin } from '../../redux/actions/authActions';
@@ -10,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { SanityImageAssetDocument } from '@sanity/client';
 import { Avatar } from '../../types/user.type';
 import { client } from '../../client';
+import { BiSolidImageAdd, BiCheckCircle } from 'react-icons/bi';
+import Input from '../shared/Input';
 
 const AuthForm = () => {
   const dispatch = useAppDispatch();
@@ -44,9 +45,7 @@ const AuthForm = () => {
     }
   }
 
-  const onSubmit = () => {
-    console.log(wrongImageType);
-    
+  const onSubmit = () => {    
     const { username, email, password } = methods.getValues();
     const salt = generateSalt();
     const hashedPassword = hashPassword(password, salt);
@@ -130,8 +129,23 @@ const AuthForm = () => {
               error={methods.formState.errors.confirmPassword?.message}
               isError={Boolean(methods.formState.errors.confirmPassword)}
             />
-            <label htmlFor="avatar">
-              Avatar
+            <label htmlFor="avatar" className='w-full cursor-pointer'>
+              <div className='w-full mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+                Avatar
+                <div className='w-full h-9 lg:h-10 flex justify-center items-center rounded-lg bg-transparent border border-gray-300 p-2.5 text-lg'>
+                  {wrongImageType ? (
+                      <p className='text-red-700 text-sm'>Wrong image type</p>
+                  ) : image ? (
+                    <div className='text-green-700'>
+                      <BiCheckCircle/>
+                    </div>
+                  ) : (
+                    <div className='text-slate-500 '>
+                      <BiSolidImageAdd/>
+                    </div>
+                  )}
+                </div>
+              </div>
               <input
                 type="file"
                 id="avatar"
