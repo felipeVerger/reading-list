@@ -70,10 +70,13 @@ export const userLogin = createAsyncThunk(
                         localStorage.setItem('user', JSON.stringify(res));
                         return res
                     } else {
+                        console.log('error validating pass and email');
+                        
                         throw new Error("The email or the password are invalid")
                     }
                 })
                 .catch((error) => {
+                    console.log("error");
                     throw new Error(error)
                 })
             return {
