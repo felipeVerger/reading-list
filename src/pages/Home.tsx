@@ -1,22 +1,20 @@
 import { urlFor } from "../client";
-import useProfileModal from "../hooks/useProfileModal"
+import { Navbar } from "../components";
 import ModalProvider from "../providers/ModalProvider"
 import { fetchUser } from "../utils/fetchUser";
+import defaultHomeBg from '../assets/images/bg-home.jpg'; 
 
 const Home = () => {
-  const { onOpen } = useProfileModal();
   const user = fetchUser();
-  
-  console.log(user.homeBackground);
-  
+
+  const backgroundImageStyle = {
+    backgroundImage: user.homeBackground ? `url(${urlFor(user.homeBackground).url()})` : `url(${defaultHomeBg})`,
+  };
 
   return (
-    <div className={`w-full h-screen ${user.homeBackground ? '' : 'bg-home-bg'} bg-cover relative`}>
-      {user.homeBackground && <img src={urlFor(user.homeBackground)} alt="home background" className="w-full h-full object-cover"/>}
+    <div className={`w-full h-screen bg-cover bg-no-repeat bg-center p-6`} style={backgroundImageStyle}>
       <ModalProvider/>
-      <button onClick={onOpen} className="absolute right-5 top-5 w-20 h-20 rounded-full border-none overflow-hidden hover:animate-jump">
-        <img src={urlFor(user.image)} alt="profile button" className="w-full h-full object-cover"/>
-      </button>
+      <Navbar user={user}/>
     </div>
   )
 }

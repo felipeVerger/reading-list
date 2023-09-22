@@ -9,10 +9,12 @@ export default {
       backgroundColor: {
         blackOverlay: 'rgba(0, 0 ,0 ,0.7)',
         modalBackground: 'rgba(22, 41, 183, 0.39)',
-        profile_hover: 'rgba(0, 0, 0, 0.5)'
+        profile_hover: 'rgba(0, 0, 0, 0.5)',
+        homeContentBg: 'rgba(17, 25, 40, 0.75)'
       },
       fontFamily: {
-        mooli: 'Mooli, sans-serif'
+        mooli: 'Mooli, sans-serif',
+        abrilFatface: 'Abril Fatface, cursive'
       },
       backgroundImage: {
         'home-bg': 'url(./src/assets/images/bg-home.jpg)'
