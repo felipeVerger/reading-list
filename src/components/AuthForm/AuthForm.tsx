@@ -1,51 +1,59 @@
-import { useState } from 'react'
-import { useForm, FormProvider } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { loginSchema, registerSchema } from '../../constants/auth.schema';
-import { generateSalt, hashPassword } from '../../utils/function';
-import { useAppDispatch, useAppSelector } from '../../hooks/storeHooks';
-import { registerUser, userLogin } from '../../redux/actions/authActions';
-import { useNavigate } from 'react-router-dom';
-import { SanityImageAssetDocument } from '@sanity/client';
-import { Avatar } from '../../types/user.type';
-import { client } from '../../client';
-import { BiSolidImageAdd, BiCheckCircle } from 'react-icons/bi';
-import Input from '../shared/Input';
+import { useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { loginSchema, registerSchema } from "../../schema/auth.schema";
+import { generateSalt, hashPassword } from "../../utils/function";
+import { useAppDispatch, useAppSelector } from "../../hooks/storeHooks";
+import { registerUser, userLogin } from "../../redux/actions/authActions";
+import { useNavigate } from "react-router-dom";
+import { SanityImageAssetDocument } from "@sanity/client";
+import { Avatar } from "../../types/user.type";
+import { client } from "../../client";
+import IconLibrary from "../../assets/icons";
+import Input from "../shared/Input";
 
 const AuthForm = () => {
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector(state => state.auth)
+  const { loading } = useAppSelector((state) => state.auth);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [image, setImage] = useState<null | Avatar | SanityImageAssetDocument>(null);
+  const [image, setImage] = useState<null | Avatar | SanityImageAssetDocument>(
+    null
+  );
   const [wrongImageType, setWrongImageType] = useState<boolean>(false);
   const methods = useForm({
-    resolver: yupResolver(isLoggedIn ? loginSchema : registerSchema)
-  })
+    resolver: yupResolver(isLoggedIn ? loginSchema : registerSchema),
+  });
   const navigate = useNavigate();
 
   const uploadAvatarImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files ? e.target.files[0] : null;
-    
+
     if (selectedFile) {
       const { type, name } = selectedFile;
-      if(type === 'image/png' || type === 'image/svg' || type === 'image/jpeg' || type === 'image/gif' || type === 'image/tiff'){
+      if (
+        type === "image/png" ||
+        type === "image/svg" ||
+        type === "image/jpeg" ||
+        type === "image/gif" ||
+        type === "image/tiff"
+      ) {
         setWrongImageType(false);
-  
+
         client.assets
-          .upload('image', selectedFile, { contentType: type, filename: name })
+          .upload("image", selectedFile, { contentType: type, filename: name })
           .then((docuemnt) => {
             setImage(docuemnt as SanityImageAssetDocument);
           })
           .catch((error) => {
-            console.log('Image upload error: ' + error);
-          })
+            console.log("Image upload error: " + error);
+          });
       } else {
         setWrongImageType(true);
       }
     }
-  }
+  };
 
-  const onSubmit = () => {    
+  const onSubmit = () => {
     const { username, email, password } = methods.getValues();
     const salt = generateSalt();
     const hashedPassword = hashPassword(password, salt);
@@ -53,45 +61,45 @@ const AuthForm = () => {
     if (isLoggedIn) {
       const user = {
         email,
-        password
-      }
+        password,
+      };
       dispatch(userLogin(user)).then((res) => {
         if (res.meta.requestStatus === "fulfilled") {
-          navigate('/')
+          navigate("/");
         } else {
-          alert('Something went wrong')
+          alert("Something went wrong");
         }
-      })
+      });
     } else {
       const doc = {
         username,
         email,
         password: hashedPassword,
         image: {
-          _type: 'image',
+          _type: "image",
           asset: {
             _type: "reference",
-            _ref: image?._id
-          }
+            _ref: image?._id,
+          },
         },
-        salt
+        salt,
       };
       dispatch(registerUser(doc)).then((res) => {
         if (res.meta.requestStatus === "fulfilled") {
           setIsLoggedIn(true);
           methods.reset();
         } else {
-          alert('Something went wrong')
+          alert("Something went wrong");
         }
-      })
+      });
     }
-  }
+  };
 
   const switchForm = () => {
     setImage(null);
     methods.reset();
     setIsLoggedIn(!isLoggedIn);
-  }
+  };
 
   return (
     <FormProvider {...methods}>
@@ -129,19 +137,19 @@ const AuthForm = () => {
               error={methods.formState.errors.confirmPassword?.message}
               isError={Boolean(methods.formState.errors.confirmPassword)}
             />
-            <label htmlFor="avatar" className='w-full cursor-pointer'>
-              <div className='w-full mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+            <label htmlFor="avatar" className="w-full cursor-pointer">
+              <div className="w-full mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Avatar
-                <div className='w-full h-9 lg:h-10 flex justify-center items-center rounded-lg bg-transparent border border-gray-300 p-2.5 text-lg'>
+                <div className="w-full h-9 lg:h-10 flex justify-center items-center rounded-lg bg-transparent border border-gray-300 p-2.5 text-lg">
                   {wrongImageType ? (
-                      <p className='text-red-700 text-sm'>Wrong image type</p>
+                    <p className="text-red-700 text-sm">Wrong image type</p>
                   ) : image ? (
-                    <div className='text-green-700'>
-                      <BiCheckCircle/>
+                    <div className="text-green-700">
+                      <IconLibrary.checkCircle />
                     </div>
                   ) : (
-                    <div className='text-slate-500 '>
-                      <BiSolidImageAdd/>
+                    <div className="text-slate-500 ">
+                      <IconLibrary.addImage />
                     </div>
                   )}
                 </div>
@@ -157,7 +165,7 @@ const AuthForm = () => {
           </>
         )}
         <button className="submit-btn" type="submit">
-          {loading ? 'loading...' : 'Submit'}
+          {loading ? "loading..." : "Submit"}
         </button>
         <p className="text-sm text-slate-500 self-center">
           {!isLoggedIn ? "Already have an account?" : "Don't have an account?"}
@@ -172,6 +180,6 @@ const AuthForm = () => {
       </form>
     </FormProvider>
   );
-}
+};
 
-export default AuthForm
+export default AuthForm;

@@ -3,15 +3,14 @@ export interface Books {
 }
 
 export interface Book {
-    id: number;
+    _id: number;
     title:    string;
     pages:    number;
     genre:    string;
     cover:    string;
     synopsis: string;
     year:     number;
-    ISBN:     string;
-    author:   Author;
+    author:   string;
 }
 
 export interface Author {
