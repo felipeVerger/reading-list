@@ -1,27 +1,24 @@
-# React + TypeScript + Vite
+# Bookerz
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project aims to motivate readers and those who want to start reading. It is a social network where users can share books that they enjoyed or that interest them. The publication contains information about the book, comments, and can be saved by other users who have similar interests.
 
-Currently, two official plugins are available:
+![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
 
-## Expanding the ESLint configuration
+**Client:** React, Redux Toolkit, TailwindCSS, React-router-dom, React hook form, Yup, React icons and more
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+**Server:** Sanity (CMS) for now
 
-- Configure the top-level `parserOptions` property like this:
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
+## Screenshots
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+
+
+## Features
+
+- Light/dark mode toggle
+- Live previews
+- Fullscreen mode
+- Cross platform
